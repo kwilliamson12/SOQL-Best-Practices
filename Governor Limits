@@ -1,0 +1,26 @@
+// Create Postal Code to Id map
+Map<STring, Id> states = new Map<String, Id>();
+for (State__c s : [SELECT Id, Postal__c From State__c WHERE Postal__c]){ //SOQL query is performed once outside the for loop.
+  states.put(s.Postal__c, s.Id); //Results are stored in a map.
+  }
+  
+  //Create list to store contacts for updating
+  List<Contact> contacts = new List<Contact>();
+  
+  for (Contact con : Trigger.new){
+    
+    if (con.PostalCode != null){
+      String statedId = states.get(con.PostalCode); //State Id is extracted from the map instead of performing an SOWL query.
+      
+      if (String.isNotBlank(stateId)){
+      
+        con.State__c = stateId;
+        contacts.add(con);
+        
+      }
+    }
+  }
+  
+  if (contacts.siz() > 1){ //The DML operation is executed outside the for loop.
+    update contacts;
+  }
